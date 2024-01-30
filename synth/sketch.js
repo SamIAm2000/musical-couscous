@@ -1,14 +1,14 @@
 // We define our palette
 //let palette = ["#2c695a", "#4ad6af", "#7facc6", "#4e93cc", "#f6684f", "#ffd300"];
-let palette = ["#F2E2C4", "#261D11", "#A6290D"];
+let palette = ["#F2E2C4", "#261D11", "#A6290D"]; //white black red
 //let palette = ['#0477BF', '#F2B705', '#F2E2C4', '#261D11', '#A6290D']; //bauhaus colors blue yellow white black red
 let available_brushes = ["hatch_brush"];
 let drawoncanvas = 0;
 function setup() {
-  noLoop();
+  //noLoop();
   createCanvas(600, 600, WEBGL);
   angleMode(DEGREES);
-  background("#fffceb");
+  background("#F2E2C4");
 
   // Scale brushes to adapt to canvas size
   brush.scaleBrushes(1.5);
@@ -18,7 +18,6 @@ function setup() {
 }
 
 function draw() {
-  frameRate(30);
   translate(-width / 2, -height / 2);
   // brush.box() returns an array with available brushes
 }
@@ -61,10 +60,12 @@ function keyPressed() {
       case 1:
         drawCircle();
         drawCircle();
+        drawLine();
         break;
       case 2:
         drawRectangle();
         drawRectangle();
+        drawLine();
         break;
       case 3:
         drawLine();
@@ -72,5 +73,8 @@ function keyPressed() {
         drawLine();
         break;
       default:
+        console.log("nothing");
     }
+    // drawCircle();
+    brush.reDraw();
 }

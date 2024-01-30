@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         '89': 880.000000000000000,  //Y - A
         '55': 932.327523036179832, //7 - A#
         '85': 987.766602512248223,  //U - B
+        
     }
 
     window.addEventListener('keydown', keyDown, false);
@@ -34,10 +35,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
     activeOscillators = {};
     activeGains = {};
     active = 0;
-    targetGain = 0.7;
+    targetGain = 0.6;
 
     const globalGain = audioCtx.createGain(); //this will control the volume of all notes
-    globalGain.gain.setValueAtTime(0.8, audioCtx.currentTime);
+    globalGain.gain.setValueAtTime(0.7, audioCtx.currentTime);
     globalGain.connect(audioCtx.destination);
 
     function keyDown(event) {
@@ -58,20 +59,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
         const key = (event.detail || event.which).toString();
         console.log(key);
         if (keyboardFrequencyMap[key] && activeOscillators[key]) {
-            // activeGains[key].gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime+1);
-            activeGains[key].gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.8);
-            // activeGains[key].gain.value = 0;
-            activeOscillators[key].stop(audioCtx.currentTime +1);
 
+            // ADSR release
+            activeGains[key].gain.setTargetAtTime(0, audioCtx.currentTime, 0.01);
+            activeOscillators[key].stop(audioCtx.currentTime +0.1);
+            
             delete activeGains[key];
             delete activeOscillators[key];
             active -= 1;
-
-            // //increase amplitude of remaining notes
-            // console.log("out" + targetGain/active);
-            // for (var curkey in activeGains){
-            //     activeGains[curkey].gain.exponentialRampToValueAtTime(targetGain/active, audioCtx.currentTime+0.7) ;
-            // }
         }
         
     }
@@ -79,7 +74,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     function playNote(key) {
         const osc = audioCtx.createOscillator();
         osc.frequency.setValueAtTime(keyboardFrequencyMap[key], audioCtx.currentTime)
-        osc.type = document.querySelector('input[name="waveform"]:checked').value;//choose your favorite waveform
+        osc.type = document.querySelector('input[name="waveform"]:checked').value; //choose your favorite waveform
 
         const gainNode = audioCtx.createGain();
         gainNode.gain.value = 0;
@@ -89,8 +84,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
         activeGains[key] = gainNode;
         osc.start();
 
-        // gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-        gainNode.gain.setTargetAtTime(targetGain/active, audioCtx.currentTime, 0.1); //attack time 0.3
+        //set Attack
+        gainNode.gain.setTargetAtTime(targetGain/active, audioCtx.currentTime, 0.01); //attack time
 
     }
 })
