@@ -6,7 +6,7 @@ function setup() {
   //set background
   createCanvas(600, 600, WEBGL);
   angleMode(DEGREES);
-  background("#FBFBF2");
+  background("#F2E2C4");
 
   // Scale brushes to adapt to canvas size
   brush.scaleBrushes(1.5);
