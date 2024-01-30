@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         '89': 880.000000000000000,  //Y - A
         '55': 932.327523036179832, //7 - A#
         '85': 987.766602512248223,  //U - B
-        
+
     }
 
     window.addEventListener('keydown', keyDown, false);
@@ -76,6 +76,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         osc.frequency.setValueAtTime(keyboardFrequencyMap[key], audioCtx.currentTime)
         osc.type = document.querySelector('input[name="waveform"]:checked').value; //choose your favorite waveform
 
+        //create and connect gain nodes
         const gainNode = audioCtx.createGain();
         gainNode.gain.value = 0;
         osc.connect(gainNode).connect(globalGain);
