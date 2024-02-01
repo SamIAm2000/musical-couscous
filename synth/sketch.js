@@ -38,6 +38,11 @@ function drawLine() {
 
 function keyPressed() {
   console.log("key pressed");
+  
+  if (keyCode === 16) {
+    save('mysketch.jpg');
+    return;
+  }
 
   //randomly choose a function to do
   //draws some shapes
