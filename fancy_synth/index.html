@@ -155,8 +155,21 @@
       <br />
       <br />
       <br />
-      <p>Press some keys to make music and draw</p>
+      <p>Press some keys to make music</p>
       <p>Press SHIFT to save your drawing</p>
+      <script>
+        document.querySelectorAll('input[name="synthtype"]').forEach(function(radio) {
+          radio.addEventListener('change', function() {
+            if (this.value === 'additive') {
+              document.getElementById('lfo-toggle-label').style.display = 'none';
+              document.getElementById('lfo-toggle').style.display = 'none';
+            } else {
+              document.getElementById('lfo-toggle-label').style.display = 'block';
+              document.getElementById('lfo-toggle').style.display = 'block';
+            }
+          });
+        });
+      </script>
     </div>
   </body>
 </html>
