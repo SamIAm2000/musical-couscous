@@ -1,69 +1,79 @@
+//global vars
+sustainGain = 0.5;
+attackAmount = 0.4;
+
+AMcarrierFrequency = 100;
+FMmodulationIndex = 100;
+FMmodulatorFreq = 100;
+lfoFrequency = 15;
+lfoAmplitude = 10;
+
+//attack, decay, release times
+attack = 0.4;
+decay = 0.4;
+release = 0.4;
+
+var globalAnalyser;
+
+const keyboardFrequencyMap = {
+    '90': 261.625565300598634,  //Z - C
+    '83': 277.182630976872096, //S - C#
+    '88': 293.664767917407560,  //X - D
+    '68': 311.126983722080910, //D - D#
+    '67': 329.627556912869929,  //C - E
+    '86': 349.228231433003884,  //V - F
+    '71': 369.994422711634398, //G - F#
+    '66': 391.995435981749294,  //B - G
+    '72': 415.304697579945138, //H - G#
+    '78': 440.000000000000000,  //N - A
+    '74': 466.163761518089916, //J - A#
+    '77': 493.883301256124111,  //M - B
+    '81': 523.251130601197269,  //Q - C
+    '50': 554.365261953744192, //2 - C#
+    '87': 587.329535834815120,  //W - D
+    '51': 622.253967444161821, //3 - D#
+    '69': 659.255113825739859,  //E - E
+    '82': 698.456462866007768,  //R - F
+    '53': 739.988845423268797, //5 - F#
+    '84': 783.990871963498588,  //T - G
+    '54': 830.609395159890277, //6 - G#
+    '89': 880.000000000000000,  //Y - A
+    '55': 932.327523036179832, //7 - A#
+    '85': 987.766602512248223,  //U - B
+
+}
+
+
 document.addEventListener("DOMContentLoaded", function(event) {
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const keyboardFrequencyMap = {
-        '90': 261.625565300598634,  //Z - C
-        '83': 277.182630976872096, //S - C#
-        '88': 293.664767917407560,  //X - D
-        '68': 311.126983722080910, //D - D#
-        '67': 329.627556912869929,  //C - E
-        '86': 349.228231433003884,  //V - F
-        '71': 369.994422711634398, //G - F#
-        '66': 391.995435981749294,  //B - G
-        '72': 415.304697579945138, //H - G#
-        '78': 440.000000000000000,  //N - A
-        '74': 466.163761518089916, //J - A#
-        '77': 493.883301256124111,  //M - B
-        '81': 523.251130601197269,  //Q - C
-        '50': 554.365261953744192, //2 - C#
-        '87': 587.329535834815120,  //W - D
-        '51': 622.253967444161821, //3 - D#
-        '69': 659.255113825739859,  //E - E
-        '82': 698.456462866007768,  //R - F
-        '53': 739.988845423268797, //5 - F#
-        '84': 783.990871963498588,  //T - G
-        '54': 830.609395159890277, //6 - G#
-        '89': 880.000000000000000,  //Y - A
-        '55': 932.327523036179832, //7 - A#
-        '85': 987.766602512248223,  //U - B
 
-    }
 
     window.addEventListener('keydown', keyDown, false);
     window.addEventListener('keyup', keyUp, false);
 
     activeOscillators = {};
     activeGains = {};
-    activeAdditiveOscillators = {};
     activeAMOscillators = {};
     activeFMOscillators = {};
+    activeAdditiveOscillators = {};
     activeLFOs = {};
 
     active = 0;
-    sustainGain = 0.4;
-    sustainGainAdditive = 0.1;
 
-    AMcarrierFrequency = 100;
-    FMmodulationIndex = 100;
-    FMmodulatorFreq = 100;
-    lfoFrequency = 15;
-    lfoAmplitude = 10;
-
-    attack = 0.4;
-    attackAmount = 0.3
-    decay = 0.4;
-    sustain = 0.4;
-    release = 0.4;
 
     const globalGain = audioCtx.createGain(); //this will control the volume of all notes
     globalGain.gain.setValueAtTime(0.7, audioCtx.currentTime);
     globalGain.connect(audioCtx.destination);
 
+    globalAnalyser = audioCtx.createAnalyser();
+    globalGain.connect(globalAnalyser);
+    draw();
+
     function keyDown(event) {
         const key = (event.detail || event.which).toString();
         attack = Number(document.getElementById('attack-slider').value)
         decay = Number(document.getElementById('decay-slider').value);
-        sustain = Number(document.getElementById('sustain-slider').value);
         release = Number(document.getElementById('release-slider').value);
 
         if (keyboardFrequencyMap[key] && !activeOscillators[key]) {
@@ -74,7 +84,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     function keyUp(event) {
         const key = (event.detail || event.which).toString();
-        console.log(key);
         if (keyboardFrequencyMap[key] && activeOscillators[key]) {
 
             // ADSR release
@@ -97,7 +106,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
             delete activeAMOscillators[key];
             delete activeFMOscillators[key];
             delete activeLFOs[key];
-            active -= 1;
         }
         
     }
@@ -123,6 +131,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         const osc = audioCtx.createOscillator();
         osc.type = waveformType;
         osc.frequency.setValueAtTime(keyboardFrequencyMap[key], audioCtx.currentTime)
+
         //create and connect gain nodes
         const gainNode = audioCtx.createGain();
         gainNode.gain.value = 0;
@@ -132,14 +141,20 @@ document.addEventListener("DOMContentLoaded", function(event) {
         activeGains[key] = gainNode;
         osc.start();
 
-        //set Attack, decay, sustain
-        t_pressed = audioCtx.currentTime;
-        gainNode.gain.linearRampToValueAtTime(sustainGain + attackAmount, t_pressed + attack);
-        gainNode.gain.linearRampToValueAtTime(sustainGain, t_pressed + attack + decay);
-        
+        // adjust gains
+        numActive = Object.keys(activeOscillators).length + Object.keys(activeAdditiveOscillators).length;
+        newGain = sustainGain/numActive;
+        for (let key in activeOscillators) {
+            activeGains[key].gain.value = newGain;
+        }
 
+        // set Attack, decay, sustain
+        t_pressed = audioCtx.currentTime;
+        gainNode.gain.linearRampToValueAtTime((sustainGain + attackAmount)/numActive, t_pressed + attack);
+        gainNode.gain.linearRampToValueAtTime(newGain, t_pressed + attack + decay);
+        
         if (lfoOn == 'yes') {
-            addLFO(key, osc)
+            addLFO(key, osc);
         }
     }
 
@@ -158,7 +173,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         const numHarmonics = 4; // Number of harmonics to add
         for (let i = 2; i <= numHarmonics; i++) {
             const curOsc = audioCtx.createOscillator();
-            curOsc.frequency.setValueAtTime(keyboardFrequencyMap[key] * i + Math.random() * 15, audioCtx.currentTime);
+            curOsc.frequency.setValueAtTime(keyboardFrequencyMap[key] * i + Math.random() * 20, audioCtx.currentTime);
             curOsc.type = waveformType;
             curOsc.connect(gainNode);
             curOsc.start();
@@ -174,18 +189,31 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         osc.start();
 
+        // adjust gains
+        let numActive = Object.keys(activeOscillators).length;
+        for (let key in activeAdditiveOscillators) {
+            numActive += activeAdditiveOscillators[key].length;
+        }
+
+        newGain = sustainGain/numActive;
+        for (let key in activeOscillators) {
+            activeGains[key].gain.value = newGain;
+        }
+
+        console.log(numActive);
+
         //set Attack, decay, sustain
         t_pressed = audioCtx.currentTime;
-        gainNode.gain.linearRampToValueAtTime(sustainGain + attackAmount, t_pressed + attack);
-        gainNode.gain.linearRampToValueAtTime(sustainGain, t_pressed + attack + decay);
+        gainNode.gain.linearRampToValueAtTime((sustainGain + attackAmount)/numActive, t_pressed + attack);
+        gainNode.gain.linearRampToValueAtTime(newGain, t_pressed + attack + decay);
         
     }
 
     function playNoteAM(key, waveformType) {
         var carrier = audioCtx.createOscillator();
         var modulatorFreq = audioCtx.createOscillator();
-        modulatorFreq.frequency.setValueAtTime(keyboardFrequencyMap[key], audioCtx.currentTime)
-        carrier.frequency.value = AMcarrierFrequency;
+        modulatorFreq.frequency.setValueAtTime(AMcarrierFrequency, audioCtx.currentTime)
+        carrier.frequency.value = keyboardFrequencyMap[key];
 
         carrier.type = waveformType;
         modulatorFreq.type = waveformType;
@@ -211,15 +239,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
         carrier.start();
         modulatorFreq.start();
 
-        // //set Attack
-        // gainNode.gain.setTargetAtTime(sustainGain, audioCtx.currentTime, 0.01); //attack time
+        // adjust gains
+        numActive = Object.keys(activeOscillators).length + Object.keys(activeAdditiveOscillators).length;
+        newGain = sustainGain/numActive;
+        for (let key in activeOscillators) {
+            activeGains[key].gain.value = newGain;
+        }
         
         //set Attack, decay, sustain
         t_pressed = audioCtx.currentTime;
-        gainNode.gain.linearRampToValueAtTime(sustainGain + attackAmount, t_pressed + attack);
-        gainNode.gain.linearRampToValueAtTime(sustainGain, t_pressed + attack + decay);
+        gainNode.gain.linearRampToValueAtTime((sustainGain + attackAmount)/numActive, t_pressed + attack);
+        gainNode.gain.linearRampToValueAtTime(newGain, t_pressed + attack + decay);
         
-
         if (lfoOn == 'yes') {
             addLFO(key, carrier);
             addLFO(key, modulatorFreq);
@@ -235,13 +266,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
         modulatorFreq.frequency.value = FMmodulatorFreq;
         carrier.frequency.value = keyboardFrequencyMap[key];
 
+        carrier.type = waveformType;
+        modulatorFreq.type = waveformType;
+
         activeOscillators[key] = carrier;
-        activeAMOscillators[key] = modulatorFreq;
+        activeFMOscillators[key] = modulatorFreq;
     
         modulatorFreq.connect(modulationIndex);
         modulationIndex.connect(carrier.frequency)
         
-        // carrier.connect(audioCtx.destination);
         // create gain node
         var gainNode = audioCtx.createGain();
         gainNode.gain.value = 0;
@@ -251,10 +284,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
         carrier.start();
         modulatorFreq.start();
 
+        // adjust gains
+        numActive = Object.keys(activeOscillators).length + Object.keys(activeAdditiveOscillators).length;
+        newGain = sustainGain/numActive;
+        for (let key in activeOscillators) {
+            activeGains[key].gain.value = newGain;
+        }
+
         //set Attack, decay, sustain
         t_pressed = audioCtx.currentTime;
-        gainNode.gain.linearRampToValueAtTime(sustainGain + attackAmount, t_pressed + attack);
-        gainNode.gain.linearRampToValueAtTime(sustainGain, t_pressed + attack + decay);
+        gainNode.gain.linearRampToValueAtTime((sustainGain + attackAmount)/numActive, t_pressed + attack);
+        gainNode.gain.linearRampToValueAtTime(newGain, t_pressed + attack + decay);
         
         if (lfoOn == 'yes') {
             addLFO(key, carrier);
@@ -263,7 +303,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     }
     function addLFO(key, osc) {
-        console.log("lfo added");
         const lfo = audioCtx.createOscillator();
         const lfoGain = audioCtx.createGain();
         lfo.type = 'sine';
@@ -278,6 +317,45 @@ document.addEventListener("DOMContentLoaded", function(event) {
             activeLFOs[key] = [lfo]
         }
 
+    }
+
+    function draw() {
+        globalAnalyser.fftSize = 2048;
+        var bufferLength = globalAnalyser.frequencyBinCount;
+        var dataArray = new Uint8Array(bufferLength);
+        globalAnalyser.getByteTimeDomainData(dataArray);
+    
+        var canvas = document.querySelector("#globalVisualizer");
+        var canvasCtx = canvas.getContext("2d");
+    
+        requestAnimationFrame(draw);
+    
+        globalAnalyser.getByteTimeDomainData(dataArray);
+    
+        canvasCtx.fillStyle = "white";
+        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+    
+        canvasCtx.lineWidth = 2;
+        canvasCtx.strokeStyle = "rgb(0, 0, 0)";
+    
+        canvasCtx.beginPath();
+    
+        var sliceWidth = canvas.width * 1.0 / bufferLength;
+        var x = 0;
+    
+        for (var i = 0; i < bufferLength; i++) {
+            var v = dataArray[i] / 128.0;
+            var y = v * canvas.height / 2;
+            if (i === 0) {
+                canvasCtx.moveTo(x, y);
+            } else {
+                canvasCtx.lineTo(x, y);
+            }
+            x += sliceWidth;
+        }
+    
+        canvasCtx.lineTo(canvas.width, canvas.height / 2);
+        canvasCtx.stroke();
     }
 
 })

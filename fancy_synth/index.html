@@ -2,87 +2,161 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/p5.brush@1.1.1/dist/p5.brush.js"></script> -->
-    <script src="main.js"></script>
-    <!-- <script defer src="sketch.js"></script> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Synthesizer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="main.js" defer></script>
+    <script src="sketch.js" defer></script>
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      #p5-canvas-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1; /* Place canvas behind other content */
+      }
+
+      .text-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        padding: 20px; /* Add padding as needed */
+        color: black; /* Text color */
+        background-color: rgba(
+          255,
+          255,
+          255,
+          0
+        ); /* fully-transparent background */
+        font-family:  Courier, sans-serif; /* Choose your font */
+      }
+      .text-overlay input[type="radio"] {
+    display: inline-block;
+    margin-right: 5px; /* Adjust margin between radio buttons */
+}
+      .text-overlay p,
+      .text-overlay label {
+        margin: 5px 0; /* Adjust spacing between text */
+      }
+
+      .slider-container {
+        margin-top: 20px; /* Adjust margin as needed */
+      }
+
+    </style>
   </head>
   <body>
-    <!-- Your HTML content goes here -->
-    <p>Pick a waveform</p>
-    <input type="radio" id="sine" name="waveform" value="sine" checked />
-    <label for="sine">sine</label>
-    <input type="radio" id="square" name="waveform" value="square" />
-    <label for="square">square</label>
-    <input type="radio" id="sawtooth" name="waveform" value="sawtooth" />
-    <label for="sawtooth">sawtooth</label>
-    <input type="radio" id="triangle" name="waveform" value="triangle" />
-    <label for="triangle">triangle</label>
+    <!-- p5.js canvas container -->
+    <div id="p5-canvas-container"></div>
 
-    <p>Pick a synthesis type</p>
-    <input type="radio" id="none" name="synthtype" value="none" checked />
-    <label for="none">none</label>
-    <input type="radio" id="additive" name="synthtype" value="additive"/>
-    <label for="additive">additive</label>
-    <input type="radio" id="AM" name="synthtype" value="AM" />
-    <label for="AM">AM</label>
-    <input type="radio" id="FM" name="synthtype" value="FM" />
-    <label for="FM">FM</label>
+    <!-- Text overlay -->
+    <div class="text-overlay">
+      <div class="container">
+        <canvas
+          id="globalVisualizer"
+          width="200"
+          height="85"
+          style="border: 1px solid #000000"
+        >wave form visualizer
+        </canvas>
+      </div>
 
-    <p>ADSR Sliders (0.0 to 1.0 second)</p>
-    <label for="attack-slider">Attack Time</label>
-    <input type="range" id="attack-slider" name="attack" min="0" max="1.0" step="0.1" value="0.4" />
-    <label for="decay-slider">Decay Time</label>
-    <input type="range" id="decay-slider" name="decay" min="0" max="1.0" step="0.1" value="0.4" />
-    <label for="sustain-slider">Sustain</label>
-    <input type="range" id="sustain-slider" name="sustain" min="0" max="1.0" step="0.1" value="0.4" />
-    <label for="release-slider">Release Time</label>
-    <input type="range" id="release-slider" name="release" min="0" max="1.0" step="0.1" value="0.4" />
-
-    <p id="lfo-toggle-label">Toggle LFO</p>
-    <div id="lfo-toggle">
-      <input type="radio" id="lfo-toggle-yes" name="lfo-toggle" value="yes" />
-      <label for="lfo-toggle-yes">Yes</label>
-      <input type="radio" id="lfo-toggle-no" name="lfo-toggle" value="no" checked />
-      <label for="lfo-toggle-no">No</label>
+      <div class="waveform">
+      <p>Pick a waveform</p>
+      <input type="radio" id="sine" name="waveform" value="sine" checked />
+      <label for="sine">sine</label>
+      <input type="radio" id="square" name="waveform" value="square" />
+      <label for="square">square</label>
+      <input type="radio" id="sawtooth" name="waveform" value="sawtooth" />
+      <label for="sawtooth">sawtooth</label>
+      <input type="radio" id="triangle" name="waveform" value="triangle" />
+      <label for="triangle">triangle</label>
     </div>
-    
 
-    <script>
-      document.querySelectorAll('input[name="synthtype"]').forEach(function(radio) {
-        radio.addEventListener('change', function() {
-          if (this.value === 'additive') {
-            document.getElementById('lfo-toggle-label').style.display = 'none';
-            document.getElementById('lfo-toggle').style.display = 'none';
-          } else {
-            document.getElementById('lfo-toggle-label').style.display = 'block';
-            document.getElementById('lfo-toggle').style.display = 'block';
-          }
-        });
-      });
-    </script>
+      <br />
+      <div class="synthtype">
+      <p>Pick a synthesis type</p>
+      <input type="radio" id="none" name="synthtype" value="none" checked />
+      <label for="none">none</label>
+      <input type="radio" id="additive" name="synthtype" value="additive" />
+      <label for="additive">additive</label>
+      <input type="radio" id="AM" name="synthtype" value="AM" />
+      <label for="AM">AM</label>
+      <input type="radio" id="FM" name="synthtype" value="FM" />
+      <label for="FM">FM</label>
+      </div>
 
-  </body>
-</html>
+      <div class="slider-container">
+        <p>ADSR Sliders (0.0 to 1.0 second)</p>
+        <label for="attack-slider">Attack Time</label>
+        <input
+          type="range"
+          id="attack-slider"
+          name="attack"
+          min="0"
+          max="1.0"
+          step="0.05"
+          value="0.2"
+        />
+        <br />
+        <label for="decay-slider">Decay Time</label>
+        <input
+          type="range"
+          id="decay-slider"
+          name="decay"
+          min="0"
+          max="1.0"
+          step="0.05"
+          value="0.2"
+        />
+        <br />
+        <label for="release-slider">Release Time</label>
+        <input
+          type="range"
+          id="release-slider"
+          name="release"
+          min="0"
+          max="1.0"
+          step="0.05"
+          value="0.2"
+        />
+        
+      </div>
+      <br />
+      <p id="lfo-toggle-label">Toggle LFO</p>
+      <div id="lfo-toggle">
+        <input type="radio" id="lfo-toggle-yes" name="lfo-toggle" value="yes" />
+        <label for="lfo-toggle-yes">Yes</label>
+        <input
+          type="radio"
+          id="lfo-toggle-no"
+          name="lfo-toggle"
+          value="no"
+          checked
+        />
+        <label for="lfo-toggle-no">No</label>
+      </div>
 
-    <p>press some keys to make music and draw</p>
-    <p>press SHIFT to save your drawing</p>
-
-    <script>
-      document.querySelectorAll('input[name="synthtype"]').forEach(function(radio) {
-        radio.addEventListener('change', function() {
-          if (this.value === 'additive') {
-            document.getElementById('lfo-toggle-label').style.display = 'none';
-            document.getElementById('lfo-toggle').style.display = 'none';
-          } else {
-            document.getElementById('lfo-toggle-label').style.display = 'block';
-            document.getElementById('lfo-toggle').style.display = 'block';
-          }
-        });
-      });
-    </script>
-
+      <br />
+      <br />
+      <br />
+      <p>Press some keys to make music and draw</p>
+      <p>Press SHIFT to save your drawing</p>
+    </div>
   </body>
 </html>
