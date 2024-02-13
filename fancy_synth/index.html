@@ -102,7 +102,7 @@
       </div>
 
       <div class="slider-container">
-        <p>ADSR Sliders (0.0 to 1.0 second)</p>
+        <p>ADSR Sliders (0.0 to 1.0)</p>
         <label for="attack-slider">Attack Time</label>
         <input
           type="range"
@@ -123,6 +123,17 @@
           max="1.0"
           step="0.05"
           value="0.2"
+        />
+        <br />
+        <label for="release-slider">Sustain Level</label>
+        <input
+          type="range"
+          id="sustain-slider"
+          name="release"
+          min="0"
+          max="0.7"
+          step="0.05"
+          value="0.3"
         />
         <br />
         <label for="release-slider">Release Time</label>
@@ -156,7 +167,8 @@
       <br />
       <br />
       <p>Press some keys to make music</p>
-      <p>Press SHIFT to save your drawing</p>
+      <p>Press SHIFT to save your drawing and reset</p>
+      <p>Press SPACE to toggle between current and original</p>
       <script>
         document.querySelectorAll('input[name="synthtype"]').forEach(function(radio) {
           radio.addEventListener('change', function() {

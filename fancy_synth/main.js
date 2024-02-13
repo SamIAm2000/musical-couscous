@@ -1,5 +1,4 @@
 //global vars
-sustainGain = 0.5;
 attackAmount = 0.4;
 
 AMcarrierFrequency = 100;
@@ -11,6 +10,7 @@ lfoAmplitude = 10;
 //attack, decay, release times
 attack = 0.4;
 decay = 0.4;
+sustainGain = 0.5;
 release = 0.4;
 
 var globalAnalyser;
@@ -74,6 +74,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         const key = (event.detail || event.which).toString();
         attack = Number(document.getElementById('attack-slider').value)
         decay = Number(document.getElementById('decay-slider').value);
+        sustainGain = Number(document.getElementById('sustain-slider').value);
         release = Number(document.getElementById('release-slider').value);
 
         if (keyboardFrequencyMap[key] && !activeOscillators[key]) {
@@ -150,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         // set Attack, decay, sustain
         t_pressed = audioCtx.currentTime;
-        gainNode.gain.linearRampToValueAtTime((sustainGain + attackAmount)/numActive, t_pressed + attack);
+        gainNode.gain.linearRampToValueAtTime(Math.min(Math.min(sustainGain + attackAmount, 1.0)/numActive, 0.9), t_pressed + attack);
         gainNode.gain.linearRampToValueAtTime(newGain, t_pressed + attack + decay);
         
         if (lfoOn == 'yes') {
