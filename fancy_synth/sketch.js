@@ -1,7 +1,7 @@
 let backgroundImage;
 function preload() {
   // Load the image
-  backgroundImage = loadImage('img.jpg');
+  backgroundImage = loadImage('img.JPG');
 }
 
 function setup() {
