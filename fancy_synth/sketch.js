@@ -1,12 +1,12 @@
 let backgroundImage;
 function preload() {
   // Load the image
-  
+  backgroundImage = loadImage('img2.jpeg');
 }
 
 function setup() {
   //set background
-  backgroundImage = loadImage('img.JPG');
+  
   let canvas = createCanvas(windowWidth, windowHeight); // Adjust according to your needs
   canvas.parent('p5-canvas-container'); // Render canvas within the #p5-canvas-container
 
