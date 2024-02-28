@@ -1,0 +1,71 @@
+.textcontainer {
+    max-width: 900px; /* Set a maximum width for the container */
+    font-family: Courier, sans-serif; /* Choose your font */
+  }
+  .image-container {
+    display: flex; /* Use flexbox */
+    flex-wrap: wrap; /* Allow items to wrap to the next line if necessary */
+    gap: 10px; /* Add some space between images */
+  }
+  img {
+    max-width: calc(
+      50% - 5px
+    ); /* Limit images to 50% of their container width */
+    height: auto; /* Maintain aspect ratio */
+  }
+  body,
+  html {
+    margin: 30;
+    padding: 60;
+    width: 90%;
+    height: 100%;
+    font-family: Courier, sans-serif; /* Choose your font */
+    font-size: 15px;
+  }
+
+  .pew {
+    position: absolute;
+    top: 50%; /* Adjust this according to your layout */
+    left: 5; /* Adjust this according to your layout */
+  }
+
+  .pot {
+    /* position: absolute;
+    top: 50%;
+    left: 0;
+    display: none; 
+    background-color: red; */
+    width: 50px;
+    height: 2px;
+    background-color: red;
+    display: none;
+    position: absolute;
+    bottom: 50%;
+    left: 0;
+
+    /* width: 50px; /* Adjust width and height as needed */
+    /* height: 5px;
+    background-color: green;
+    animation-name: run;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-iteration-count: 1; */
+    /* animation-play-state: paused; */
+  }
+  .lasercontainer {
+    position: relative;
+  }
+
+  .animate {
+    display: block;
+    animation: run 0.5s linear;
+  }
+
+  @keyframes run {
+    0% {
+      left: 0;
+    }
+    100% {
+      left: 100%;
+    }
+  }

@@ -1,130 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sound Synthesis</title>
-  <style>
-    .textcontainer {
-      max-width: 900px; /* Set a maximum width for the container */
-      font-family: Courier, sans-serif; /* Choose your font */
-    }
-    .image-container {
-      display: flex; /* Use flexbox */
-      flex-wrap: wrap; /* Allow items to wrap to the next line if necessary */
-      gap: 10px; /* Add some space between images */
-    }
-    img {
-      max-width: calc(50% - 5px); /* Limit images to 50% of their container width */
-      height: auto; /* Maintain aspect ratio */
-    }
-    body,
-    html {
-      margin: 15;
-      padding: 0;
-      height: 100%;
-      font-family: Courier, sans-serif; /* Choose your font */
-      font-size: 14px;
-    }
-    
-      #pot {
-    bottom: 15%;
-    position: absolute;
-    -webkit-animation: linear infinite;
-    -webkit-animation-name: run;
-    -webkit-animation-duration: 5s;
-  }
-  @-webkit-keyframes run {
-    0% {
-      left: 0;
-    }
-    50% {
-      left: 100%;
-    }
-  }
-  </style>
-</head>
-<body>
-  <p>Babbling Brook Sound</p>
-  <button id="waterSoundButton">Play</button>
-  <p>Laser Blaster</p>
-  <button id="pew">Play</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sound Synthesis</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <p>Babbling Brook Sound</p>
+    <button id="waterSoundButton">Play</button>
+    <p>Laser Blaster</p>
 
+    <div class="lasercontainer">
+      <button id="pew">Play</button>
+      <div id="pot"></div>
+    </div>
 
-  <!-- <div id="pot">
-    <img src="img1.png" width=100px height=100px>
-  </div> -->
+    <br />
+    <div class="container">
+      <canvas
+        id="globalVisualizer"
+        width="200"
+        height="85"
+        style="border: 1px solid #000000"
+        >wave form visualizer</canvas
+      >
+      <script src="main.js"></script>
+    </div>
+    <h3>Inspiration</h5>
+      <p>
+        The sound I was trying to recreate was the Star Wars Laser Blaster
+        sound. There are many versions of the sound in the movies as each gun
+        has a slightly different quality, but they all share the "pew pew" sound
+        that starts high pitched and then ends low.
+      </p>
 
+      <p>
+        I looked into how to sound was created for the movies and found that the
+        foley artists used the sound of hitting a long metal power line (or
+        radio line?) with a mallet. The physics behind it is called dispersion:
+        since different frequencies travel at different speeds through air and
+        metal, we hear a change in pitch.
+      </p>
 
-  <br />
-  <br />
-  <div class="container">
-    <canvas id="globalVisualizer" width="200" height="85" style="border: 1px solid #000000;">wave form visualizer</canvas>
-    <script src="main.js"></script>
-  </div>
-  
-  <div class="textcontainer">
-    <p>
-      The sound I was trying to recreate was the Star Wars Laser Blaster sound.
-      There are many versions of the sound in the movies as each gun has a
-      slightly different quality, but they all share the "pew pew" sound that
-      starts high pitched and then ends low.
-    </p>
-
-    <p>
-      I looked into how to sound was created for the movies and found that the
-      foley artists used the sound of hitting a long metal power line (or radio
-      line?) with a mallet. The physics behind it is called dispersion: since different
-      frequencies travel at different speeds through air and metal, we hear a
-      change in pitch.
-    </p>
-
-    <p>
-      To recreate this sound, I first looked at spectrograms of different
-      versions of the sound.
+      <p>
+        To recreate this sound, I first looked at spectrograms of different
+        versions of the sound.
+      </p>
+      The first image is the
+      <a href="https://youtu.be/1o_mKDJCcGY?si=4BGabufS7w04u2oC"
+        >sound of blasters</a
+      >
+      from the original Star Wars movies.
       <br />
       <br />
-      The first image is the <a href="https://youtu.be/1o_mKDJCcGY?si=4BGabufS7w04u2oC">sound of blasters</a> from the original Star Wars
-      movies. 
+      The second image is the sound of a
+      <a href="https://www.youtube.com/watch?v=fl0wIdGxfbQ"
+        >power line being hit</a
+      >.
       <br />
       <br />
-      The second image is the sound of a <a href="https://www.youtube.com/watch?v=fl0wIdGxfbQ">power line being hit</a>.
       <div class="image-container">
         <img src="img2.png" alt="spectrogram of star wars blasters" />
         <img src="img3.png" alt="spectrogram of power line hit" />
       </div>
       <br />
-      I saw that the sounds all started with a high frequency that quickly 
-      dropped to almost 0 Hz exponentially. This inspired me to use the a sine wave 
-      oscillator that started with a high freqeuncy and then use the <em>exponentialRampToValueAtTime()</em>
+      
+      <h3>How I made it</h5>
+      I saw that the sounds all started with a high frequency that quickly
+      dropped to almost 0 Hz exponentially. This inspired me to use the a sine
+      wave oscillator that started with a high freqeuncy and then use the
+      <em>exponentialRampToValueAtTime()</em>
       function to ramp down the frequency.
       <br />
       <br />
-      I first started with one oscillator imitating the second image and the sound was already pretty close. 
-      I really liked how the original Star Wars blaster sounds had a low twang while they were being fired. 
-      From observing the spectrograms, there were multiple bands of frequencies that were lowered 
-      consecutively, so I added more oscillators to the sound and lowered them to 0 at different times. The 
-      result was a sound that was very close to the original.
+      I first started with one oscillator imitating the second image and the
+      sound was already pretty close. I really liked how the original Star Wars
+      blaster sounds had a low twang while they were being fired. From observing
+      the spectrograms, there were multiple bands of frequencies that were
+      lowered consecutively, so I added more oscillators to the sound and
+      lowered them to 0 at different times. The result was a sound that was very
+      close to the original.
       <br />
       <br />
-      I also added some reverb because it sounded cool. 
+      I also added some reverb because it sounded cool.
       <br />
       <br />
-      Below is the spectrogram of the sound I created and the audio signal flow graph. It's just 
-      simple additive synthesis with reverb, but it works. The ADSR envelopes for each of the oscillators 
-      took more trial and error to get the nuancies of the sound right.
+      Below is the spectrogram of the sound I created and the audio signal flow
+      graph. It's just simple additive synthesis with reverb, but it works. The
+      ADSR envelopes for each of the oscillators took more trial and error to
+      get the nuancies of the sound right.
       <br />
       <br />
-      <div class="image-container"></div>
-      <img src="img1.png" alt="spectrogram of star wars blasters from synthesized sound" />
-      <img src="img4.png" alt="audio signal flow graph" />
+      <div class="image-container">
+        <img
+          src="img1.png"
+          alt="spectrogram of star wars blasters from synthesized sound"
+        />
+        <img src="img4.png" alt="audio signal flow graph" />
       </div>
       <br />
-      Future thoughts: More oscillators? More bass?
+      <h3> Future thoughts </h3>
+        More oscillators? More bass? More reverb?
       <br />
       <br />
       <br />
-    </p>
-  </div>
-</body>
+  </body>
 </html>
