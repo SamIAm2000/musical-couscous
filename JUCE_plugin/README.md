@@ -5,3 +5,4 @@ The slider changes the gain and the pitch shift button toggles the pitch. The pi
 ![plugin interface](./plugin.png)
 ![plugin settings](./settings.png)
 
+![plugin demo](./plugindemo.mp4)
